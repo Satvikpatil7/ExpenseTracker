@@ -35,5 +35,4 @@ A simple **Expense Tracker** using **React, Vite, and Tailwind CSS**, demonstrat
 - **React** - UI framework
 - **Tailwind CSS** - Styling
 
-## Happy Coding! 🚀
 
