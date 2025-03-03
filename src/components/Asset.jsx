@@ -3,30 +3,36 @@ import AssetList from './AssetList';
 
 const Asset = () => {
   const [assList, setAssList] = useState([]);
-  const [assAmount, setAssAmount] = useState(0);
+  const [assAmount, setAssAmount] = useState("");
   const [assDescription, setAssDescription] = useState("");
   const descriptionRef = useRef(null);
 
   useEffect(() => {
-    const storedAssets = JSON.parse(localStorage.getItem("assets")) || [];
-    console.log("Asset (useEffect) run-1");
-    setAssList(storedAssets);
+    const storedAssets = localStorage.getItem("assets");
+    if (storedAssets) {
+      try {
+        setAssList(JSON.parse(storedAssets));
+      } catch (error) {
+        console.error("Error parsing localStorage data:", error);
+        setAssList([]);
+      }
+    }
   }, []);
-
-  useEffect(() => {
-    localStorage.setItem("assets", JSON.stringify(assList));
-    console.log("Asset (useEffect) run-2");
-  }, [assList]);
 
   const addAsset = () => {
     console.log("Asset addAsset");
     if (!assDescription || !assAmount) return;
 
     const newAsset = { id: Date.now(), description: assDescription, amount: parseFloat(assAmount) };
-    setAssList((prev) => [...prev, newAsset]);
+
+    setAssList((prev) => {
+      const updatedList = [...prev, newAsset];
+      localStorage.setItem("assets", JSON.stringify(updatedList));
+      return updatedList;
+    });
 
     setAssDescription("");
-    setAssAmount(0);
+    setAssAmount("");
 
     descriptionRef.current.focus();
   };
@@ -34,8 +40,8 @@ const Asset = () => {
   const totalAssets = assList.reduce((acc, asset) => acc + asset.amount, 0);
 
   console.log("Asset re-rendered-1");
-   const [che,setch]=useState(0); 
-  
+  const [che, setCh] = useState(0);
+
   return (
     <div className="p-6 max-w-md mx-auto bg-white rounded-lg shadow-md mt-6">
       <h2 className="text-xl font-bold mb-4">Asset Tracker</h2>
@@ -63,13 +69,12 @@ const Asset = () => {
 
       <h3 className="text-lg font-bold mb-2">Total: ${totalAssets.toFixed(2)}</h3>
       <button 
-        onClick={() => setch(che+1)} 
+        onClick={() => setCh(che + 1)} 
         className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 active:bg-blue-700 transition duration-200"
       >
         {che}
       </button>
       <AssetList assList={assList} />
-
     </div>
   );
 }
